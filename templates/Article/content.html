@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}{{article.pmid}}{% endblock %}
+{% block content %}
+<div>
+    <h1 style="font-family:'Times New Roman';font-size:28px"">{% autoescape off %}{{ article.title }}{% endautoescape %} </h1>
+</div>
+    <div style="font-family:'Times New Roman';font-size:16px">
+    <p>Pubmed id:&nbsp;
+    <a href="https://www.ncbi.nlm.nih.gov/pubmed/?term={{article.pmid}}%5Buid%5D">{{ article.pmid }}</a>
+    </p>
+    </div>
+    <div style="font-family:'Times New Roman';font-size:16px"><p>Journal:&nbsp;<a href="/famine/journal/{{ article.journal.name }}">{{ article.journal.name }}</a>
+        (IF:&nbsp;{{ article.journal.ifactor }})</p></div>
+    {% if user.is_authenticated %}
+        <div style="font-family:'Times New Roman';font-size:16px"><p>Authors:&nbsp;<b>You can update the co-first authors on this table.</b></div>
+        <div class="row">
+        <table class="table" style="font-family:'Times New Roman'">
+            <tr>
+                <td class="col-md-2 text-center">Name</td>
+                <td class="text-center">Chinese</td>
+                <td class="text-center">Rank</td>
+                <td class="text-center">First</td>
+                <td class="text-center">Co-first</td>
+            </tr>
+            <form action="result" method="POST">
+            {% csrf_token %}
+            {% for rank in ranks %}
+            <tr>            
+                <td class="text-center"><a href="/famine/author/{{ rank.author.id }}">{{ rank.author.name }}</a></td>
+                {% if rank.author.chinese == 'Yes' %}
+                    <td class="text-center"><input type="checkbox" name="chinese" value={{rank.author.id}} checked="checked" /></td>
+                {% else %}
+                    <td class="text-center"><input type="checkbox" name="chinese" value={{rank.author.id}} /></td>
+                {% endif %}
+                <td class="text-center">{{ rank.rank }}</td>
+                {% if rank.first == 'Yes'%}
+                    <td class="text-center"><input type="checkbox" name="first" value={{rank.author.id}} checked="checked" disabled="disabled"/></td>
+                {% else %}
+                    <td class="text-center"><input type="checkbox" name="first" value={{rank.author.id}} disabled="disabled"/></td>
+                {% endif %}
+
+                {% if rank.cofirst == 'Yes' %}
+                    <td class="text-center"><input type="checkbox" name="cofirst" value={{rank.author.id}} checked="checked" /></td>
+                {% else %}
+                    <td class="text-center"><input type="checkbox" name="cofirst" value={{rank.author.id}} /></td>
+                {% endif %}
+            </tr>
+            {% endfor %}
+            </table>
+            <p class="text-right"><input type="submit" class="btn" value="update"></p>
+            </form>
+            </div>
+    {% else %}
+        <div style="font-family:'Times New Roman';font-size:16px">
+            <p>Authors:&nbsp;
+            {% for rank in ranks %}
+            <a href="/famine/author/{{ rank.author.id }}">{{ rank.author.name }}</a>.<sup>{{ rank.rank }}</sup>&nbsp;
+            {% endfor %}</p>
+        </div>
+    {% endif %}
+   
+        <div style="font-family:'Times New Roman';font-size:16px"><p>Publish date:&nbsp;{{ article.pubdate }}</p></div>
+        <div style="font-family:'Times New Roman';font-size:16px"><p>Abstract:&nbsp;{% autoescape off %}{{ article.abstract }}{% endautoescape %}</div>
+        <div style="font-family:'Times New Roman';font-size:16px"><p>Topic:&nbsp;<a href="/famine/topic/{{ article.subject }}">{{ article.subject}}</a></p></div>
+        <div style="font-family:'Times New Roman';font-size:16px"><p>Doi:&nbsp;{{article.doi}}</p></div>
+
+{% endblock %}

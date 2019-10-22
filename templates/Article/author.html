@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}{{ author.id }}{% endblock %}
+{% block content %}
+    <div class="row">
+        <h1 style="font-family:Georgia;font-size:28px">{{ author.name }}'s articles:</h1>
+    </div>
+    <div class="row" style="font-family:'Times New Roman';font-weight:bold">
+            <p>{{ author.name }}'s impact factor score: {{ score }}</p>
+            <form action='' method='post'>
+            <p>{{ author.name }}'s email:</p>
+            <p><input type="text" style="text-align:center" name="email" class="vTextField" maxlength="50" size=30  value={{ author.email }}>
+            {% if user.is_authenticated %}
+            <input type="submit" value="update"/>
+            {% endif %}</p>
+            </form>
+            <p>Affiliation:</p>
+            <p>{{ author.affiliation }}</p>
+    </div>
+    <br />        
+        {% for article in articles %}
+        <div class="row" style="font-family:'Times New Roman';font-size:16px">
+        {% autoescape off %}
+            <p style="font-weight:bold"><a href="/famine/title/{{article.article.pmid}}/">{{ article.article.title }}</a></p>
+            <p>Journal:&nbsp;<a href="/famine/journal/{{article.article.journal}}">{{ article.article.journal.name }}</a>
+                (IF:&nbsp;{{ article.article.journal.ifactor }})</p>
+            <p>Full name:&nbsp;<a href="/famine/author/{{ author.id }}">{{ author.name }}</a></p>
+            <p>Abstract:&nbsp;</p>{{ article.article.abstract }}
+            <p>Publish date:&nbsp;{{ article.article.pubdate }}</p>          
+            <p>Rank:&nbsp;{{ article.rank }}</p>
+            <p>
+            {% if article.first == 'Yes' and article.cofirst == None %}First author&nbsp;{% endif %}
+            {% if article.first == 'Yes' and article.cofirst == 'Yes' %}Co-first author&nbsp;{{ article.rank }}{% endif %}
+            {% if article.first == None and article.cofirst == 'Yes' %}Co-first author&nbsp;{{ article.rank }}{% endif %}
+            </p>
+            <p>Topic:&nbsp;<a href="/famine/topic/{{ article.article.subject}}">{{ article.article.subject }}</a></p>
+        {% endautoescape %}
+        </div>
+        {% endfor %}      
+{% endblock %}

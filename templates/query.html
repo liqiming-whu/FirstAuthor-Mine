@@ -1,0 +1,114 @@
+{% load tags %}
+<div class="col-md-6 text-center" style="border:1px solid #C0C0C0; width:50%; height:320px; overflow:auto; font-family:'Times New Roman';font-weight:bold">
+<form action="" method="post" id="form_search">
+{% csrf_token %}
+    <table class="table">
+        <tr>
+            <td class='text-left col-md-3'><label for="id_name" class="required">Name: </label></td>
+            <td class='text-left col-md-2'><input type="text" name="name" class="vTextField" maxlength="50"  id="id_name" value="{{ dict.name }}"></td>
+            <td class='text-center col-md-1'>
+                <select name="rela" required="" id="rel" >
+                    <option value="1">and</option>
+                    <option value="2">or</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td class='text-left col-md-3'><label for="journal" class="required">Journal: </label></td>
+            <td class='text-left col-md-2'>
+                <select name="journal" multiple="multiple", size='3', id="journal">
+                {% for jour in journals %}
+                    <option value={{ jour.id }}>{{ jour.name }}</option>
+                {% endfor %}
+                </select>
+            </td>
+            <td class='text-center col-md-1'>
+                <select name="andor" required="" id="ando">
+                    <option value="1">and</option>
+                    <option value="2">or</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td class='text-left col-md-3'><label for="topic" class="required">Topic: </label></td>
+            <td class='text-left col-md-2'>
+                <select name="topic" id='topic'>
+                    <option value=''>All</option>
+                    <option value='1'>Biology</option>
+                    <option value='2'>Physics</option>
+                    <option value='3'>Chemistry</option>
+                    <option value='4'>Computer Science</option>
+                    <option value='5'>Other</option>
+                </select>
+            </td>
+            <td class='text-center col-md-1'>
+            <select name='reand' required="" id="reand">
+                <option value="1">and</option>
+                <option value="2">or</option>
+            </select>
+            </td>
+        </tr>
+        <tr>
+            <td class='text-left col-md-2'><lable class="required">Date range: </lable></td>
+            <td class='text-left col-md-2'>
+                <input type="text" name="fdate" class="vDateField"  id="fdate" value="{{ dict.fdate }}"
+                    onfocus="javascript:if(this.value=='yyyy-mm-dd')this.value=''"/>
+            </td>
+            <td class='text-left col-md-2'>
+                <input type="text" name="tdate" class="vDateField" id="tdate" value="{{ dict.tdate }}"
+                    onfocus="javascript:if(this.value=='yyyy-mm-dd')this.value=''">
+            </td>
+        <tr>
+            <td class='text-left col-md-3'><lable class="required">Order: </lable></td>
+            <td class='text-right col-md-3'>
+                <select name='order' required="" id="order">
+                    <option value='1'>Reverse order</option>
+                    <option value='2'>Order</option>
+                </select>
+            </td>
+        </tr>
+    </table>
+<p><input type="submit" class="btn" value="search"/></p>
+</form>
+</div>
+<div class="col-md-6 text-center" style="border:1px solid #C0C0C0; width:50%; height:320px; overflow:auto; font-family:'Times New Roman';font-weight:bold">
+    <br />
+    <p class="text-center">Query:</p>
+    <table class="table">
+        <tr>
+            <td class='text-left'>Name: </td>
+            <td class='text-left'>{% if dict.name %}{{ dict.name }}{% endif %}</td>
+        </tr>
+        <tr>
+            <td class='text-left'>Journal: </td>
+            <td class='text-left'>{% if journal_lst %}{{ journal_lst }}{% endif %}</td>
+        </tr>
+        <tr>
+            <td class='text-left'>Topic: </td>
+            <td class='text-left'>{% if dict.topic == '1'%}Biology
+                {% elif dict.topic == '2' %}Physics
+                {% elif dict.topic == '3' %}Chemistry
+                {% elif dict.topic == '4' %}Computer Science
+                {% elif dict.topic == '5' %}Other
+                {% endif %}
+            </td>
+        </tr>
+        <tr>
+            <td class='text-left'>Date range: </td>
+            <td class='text-left'>From: {% if dict.fdate and dict.fdate != 'yyyy-mm-dd' %}{{ dict.fdate }}{% endif %}</td>
+            <td class='text-left'>To: {% if dict.tdate and dict.tdate != 'yyyy-mm-dd' %}{{ dict.tdate }}{% endif %}</td>
+        </tr>
+        <tr>
+            <td class='text-left'>Records: </td>
+            <td class='text-left'>{{ count }}</td>
+        </tr>
+    </table>
+    <p>
+    <a href='?name={{ dict.name|trimdash }}&rela={{ dict.rela }}&journal={{ dict.journal }}&andor={{ dict.andor }}&fdate={{ dict.fdate }}&tdate={{ dict.tdate }}&reand={{ dict.reand }}&order={{ dict.order }}&topic={{ dict.topic }}&download=1'>
+        <button  type="button" class="btn">Download result</button></a>
+    </p>
+</div>
+
+<div>
+<p class="text-right" style="font-family:'Times New Roman';font-weight:bold">Press Ctrl/Commend + Mouse to make multiple choices.</p>
+</div>

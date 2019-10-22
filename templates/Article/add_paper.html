@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block title %}add_article{% endblock %}
+{% block content %}
+<div class="row text-center vertical-middle-sm">
+    <h1 style="font-family:'Times New Roman';font-size:28px">Add Papers</h1>
+</div>
+<br />
+<div id="addform" style="font-family:'Times New Roman';font-size:16px;font-weight:bold"></div>
+    <form class="form-horizontal" action="", method="post", id="form">
+        <div class="form-group">
+            <label for="journal" class="control-lable col-md-5 text-right" style="font-size:17px">Journal&nbsp;&nbsp;&nbsp;&nbsp;:</label>
+            <div class="col-md-3 text-left"><select class="form-control" name="journal" id="journal">
+                <option value=''>---------</option>
+                {% for jour in journals %}
+                <option value={{ jour.id }}>{{ jour.name }}</option>
+                {% endfor %}
+            </select></div>
+        </div>
+        <div class="form-group">
+            <label for="fdate" class="control-lable col-md-5 text-right" style="font-size:17px">From&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:</label>
+            <div class="col-md-3 text-left">
+                <input class="form-control" type="text" name="fdate" class="vDateField" id="fdate" value="{{ dict.fdate }}"/>
+            </div>
+        </div>
+            <label for="tdate" class="control-lable col-md-5 text-right" style="font-size:17px">To&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:</label>
+        <div class="form-group">
+                <div class="col-md-3 text-left">
+                    <input class="form-control" type="text" name="tdate" class="vDateField" id="tdate" value="{{ dict.tdate }}"/>
+                </div>
+        </div>
+    </form>
+        <div class="text-center"><button id="submit" onclick="search_paper()"  class="btn">Search</div>
+</div>
+<script type="text/javascript" src='{% static "js/jquery.js" %}'></script>
+<script type="text/javascript" src='{% static "js/layer.js" %}'></script>
+<script>
+function search_paper(){
+    var journal=document.getElementById('journal').value;
+    var fdate=document.getElementById('fdate').value;
+    var tdate=document.getElementById('tdate').value;
+    layer.open({
+        type: 1,
+        area: ["400px", "200px"],
+        title: "Add Papers",
+        content: '<div class="text-center" style="margin-top:20px"><p>Press OK to start, this will take a few minutes.</p>',
+        btn:['OK', 'Cancel'], yes: function(){
+            layer.msg('Searching on PubMed...',{icon:16, time:100000}),
+            $.ajax({
+                    url: '{% url "article:add_paper" %}',
+                    type: "POST",
+                    data: {"journal": journal,
+                           "fdate": fdate,
+                           "tdate": tdate},
+                success: function(e){
+                    if(e=='-6'){
+                        layer.msg("Poor network.");
+                    }else if(e=='-5'){
+                        layers.msg("Error in parsing process.");
+                    }else if(e=='-4'){
+                        layer.msg("Please choose a journal.");
+                    }else if(e=='-3'){
+                        layer.msg("Please input a legal date.");
+                    }else if(e=='-2'){
+                        layer.msg("No results.");
+                    }else if(e=='-1'){
+                             layer.msg("Add to database failed.");
+                    }else{
+                         layer.msg('Completed. '+e+' papers<br /> has been added to the database.', {time: 3000}, function(){
+                            parent.location.reload();
+                        })
+                    }
+                },
+            })
+        },
+    });
+}
+</script>
+{% endblock %}

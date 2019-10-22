@@ -1,0 +1,6 @@
+pandas
+scikit-learn
+entrezpy
+nltk
+django
+xlwt

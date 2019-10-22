@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block title %}add_journal{% endblock %}
+{% block content %}
+<div class="row text-center vertical-middle-sm">
+    <h1 style="font-family:'Times New Roman';font-size:28px">Add Journals</h1>
+</div>
+
+<div class="row" style="font-family:'Times New Roman';font-size:16px">
+    <p class="text-right"><button id="add_journal" onclick="add_journal()"  class="btn">Add journal</button></p>
+    <p class="text-left" style="font-size:14px;font-weight:bold">&nbsp;&nbsp;You can add, change, delete journal items on this table.</p>
+    <table class="table table-hover text-center">
+            <tr style="font-weight:bold">
+                <td class="col-md-4">Name</td>
+                <td class="col-md-4">IF</td>
+                <td class="col-md-4">Action</td>
+            </tr>
+            {% for journal in journals %}
+            <tr>
+                <td class="col-md-4"><a href="/famine/journal/{{ journal.name }}">{{ journal.name }}</a></td>
+                <td class="col-md-4">{{ journal.ifactor }}</td>
+                <td class="col-md-4"><a name="edit" href="javascript:" onclick="edit_journal(this, {{ journal.id }})">
+                <span class="glyphicon glyphicon-pencil"></span></a>
+                <a name="edit" href="javascript:" onclick="del_journal(this, {{ journal.id }})">
+                <span class="glyphicon glyphicon-trash"></span></a></td>
+            </tr>
+            {% endfor %}
+    </table>
+</div>
+
+<script type="text/javascript" src='{% static "js/jquery.js" %}'></script>
+<script type="text/javascript" src='{% static "js/layer.js" %}'></script>
+<script type="text/javascript">
+    function add_journal(){
+        var index = layer.open({
+            type: 1,
+            area: ['400px', '220px'],
+            title: "Add journal",
+            content:'<div class="text-center" style="margin-top:20px">\
+                <p>Please input journal name and impact factor:</p>\
+                <p>Journal name: <input type="text" id="name" size=15></p>\
+                <p>Impact &nbsp;factor: <input type="text" id="ifactor" size=15></p></div>',
+            btn: ['OK', 'Cancel'],
+            yes: function(index, layero){
+                name = $('#name').val();
+                ifactor = $('#ifactor').val();
+                $.ajax({
+                    url:'{% url "article:add_journal" %}',
+                    type:'POST',
+                    data:{"name": name, "ifactor": ifactor},
+                    success:function(e){
+                        if(e=='1'){
+                            layer.msg("Completed.", {time:1000}, function(){
+                            parent.location.reload();
+                        })
+                        }else if(e=='3'){
+                            layer.msg("Failed. Please input legal content.");
+                        }else{
+                            layer.msg("Target already exists.")
+                        }
+                    },
+                });
+            },
+            btn2: function(index, layero){
+                layer.close(index);
+            }
+                     
+        });
+    }    
+
+function edit_journal(the, journal_id){
+    var name = $(the).parents("tr").children("td").eq(0).text();
+    var ifactor = $(the).parents("tr").children("td").eq(1).text();
+    var index = layer.open({
+        type: 1, 
+        area: ["400px", "220px"], 
+        title: "Edit journal",
+        content: '<div class="text-center" style="margin-top:20px"> <p>Please input journal name and impact factor:</p>\
+            <p>Journal name: <input type="text" id="new_name" value="'+name+'" size=15><p>\
+            <p>Impact &nbsp;factor: <input type="text" id="new_ifactor" value="'+ifactor+'" size=15></p></div>',
+        btn:['OK', 'Cancel'],
+        yes: function(index, layero){
+            name = $("#new_name").val();
+            ifactor = $("#new_ifactor").val();
+            $.ajax({
+                url: "{% url 'article:edit_journal' %}",
+                type: "POST",
+                data: {"id": journal_id, "name": name, "ifactor": ifactor}, 
+                success: function(e){
+                    if(e=="1"){ 
+                        layer.msg("Completed.", {time:1000}, function(){
+                            parent.location.reload();
+                        })
+                    }else if(e=="0"){ 
+                        layer.msg("Failed.")
+                    }else{
+                        layer.msg("Failed. Please input legal content.");                        
+                    } 
+                },
+            }); 
+        },
+    }); 
+}
+
+function del_journal(the, journal_id){
+    var name = $(the).parents("tr").children("td").eq(0).text(); 
+    layer.open({
+        type: 1,
+        area: ["400px", "200px"],
+        title: "Delete journal",
+        content: '<div class="text-center" style="margin-top:20px"><p>Delete journal <i>'+name+'</i> ?</p> </div>',
+        btn:['OK', 'Cancel'], yes: function(){
+            $.ajax({
+                url: '{% url "article:del_journal" %}', 
+                type:"POST",
+                data: {"id":journal_id},
+                success: function(e){
+                    if(e=="1"){  
+                        layer.msg("Completed.", {time:1000}, function(){
+                            parent.location.reload();
+                        });
+                    }else{ 
+                        layer.msg("Failed");
+                    } 
+                },
+            }) 
+        },
+    }); 
+}
+</script>
+{% endblock %}

@@ -1,0 +1,34 @@
+{% load staticfiles %}
+<div class="container">
+    <nav class="navbar navbar-default" role="navigation"> 
+        <div class="navbar-header">
+            <a class="navbar-brand" href="{% url 'article:title' %}">
+            <img src="{% static 'images/logo.png' %}" width="150px"></a>
+        </div>
+        <div>
+            <ul class="nav navbar-nav clearfix hidden-xs"  style="margin-left:10px">
+            {% if user.is_authenticated %}
+            <li><a href="{% url 'article:first' %}">Papers</a></li>
+            <li><a href="{% url 'article:score' %}">Authors</a></li>
+            <li><a href="{% url 'article:add_journal' %}">Add Journals</a></li>
+            <li><a href="{% url 'article:add_paper' %}">Add Papers</a></li>
+            {% endif %}
+            </ul>
+            
+        </div>
+        <div>
+            <ul class="nav navbar-nav navbar-right" style="margin-right:10px">
+            {% if user.is_authenticated %}
+            <li><a href="#">{{ user.username }}</a></li>
+            <li><a href="{% url 'account:user_logout' %}">Logout</a></li>
+            {% else %}
+            <li><a href="{% url 'account:user_login' %}">Login</a></li>
+            <li><a href="{% url 'account:user_register' %}">Register</a></li>
+            {% endif %}
+            </ul>
+       </div>
+    </nav>
+</div>
+
+<script src="{% static 'js/jquery.js' %}"></script> 
+<script src="{% static 'js/bootstrap.js' %}"></script>

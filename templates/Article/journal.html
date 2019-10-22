@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% block title %}journal{% endblock %}
+{% block content %}
+    <div class="row">
+        <h1 style="font-family:Georgia;font-size:28px">{{ journal.name }}
+    </div>
+    <div class="row">
+        <p style="font-family:'Times New Roman';font-size:16px">{{ journal.name }}'s impact factor: {{ journal.ifactor }}.
+        &nbsp;&nbsp;Total {{ count }} items.</p>
+    </div>
+    <br />
+    {% for article_authors in article_authors_list %}
+        <div class="row" style="font-family:'Times New Roman';font-size:16px">
+            {% autoescape off %}
+            <p style="font-weight:bold"><a href="/famine/title/{{ article_authors.0.pmid }}">{{ article_authors.0.title }}</a></p>
+            <p>Pubmed id:&nbsp;<a href="https://www.ncbi.nlm.nih.gov/pubmed/?term={{article_authors.0.pmid}}%5Buid%5D">{{ article_authors.0.pmid }}.</a>
+            &nbsp;&nbsp;Publish date:&nbsp;{{ article_authors.0.pubdate }}.&nbsp;&nbsp;Doi:&nbsp;{{ article_authors.0.doi }}</p>
+            {% if article_authors.2 %}
+            <p>Co-first authors:&nbsp;{% for co in article_authors.2 %}<a href="/famine/author/{{ co.author.id }}">{{ co.author.name }}</a>. {% endfor %}</p>
+            {% else %}<p>First author:&nbsp;<a href="/famine/author/{{ article_authors.1.author.id }}">{{ article_authors.1.author.name}}</a>.</p>
+            {% endif %} 
+            <p>Topic:&nbsp;<a href="/famine/topic/{{ article_authors.0.subject }}">{{ article_authors.0.subject }}</a></p>
+            {% endautoescape %}
+        </div>
+        <br />
+    {% endfor %}
+<div>
+    <nav aria-lable="Page navigation">
+        <ul class="pagination">
+            {% if article_authors_list.has_previous %}
+            <li>
+                <a href="?page={{ article_authors_list.previous_page_number }}" aria-lable='Previous'>
+                    <span aria-hidden="true">&laquo;</span>                    
+                </a>
+            </li>
+            {% endif %}
+            {% for pg in article_authors_list.paginator.page_range %}
+                {% if article_authors_list.number == pg %}
+                    <li class="active"><a href="?page={{ pg }}">{{ pg }}</a></li>
+                {% else %}
+                    <li><a href="?page={{ pg }}">{{ pg }}</a></li>
+                {% endif %}
+            {% endfor %}
+            {% if article_authors_list.has_next %}
+            <li>
+                <a href="?page={{ article_authors_list.next_page_number }}" aria-lablle="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>
+{% endblock %}
+
+
+

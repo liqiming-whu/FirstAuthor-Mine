@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% load tags %}
+{% block title %}Authors{% endblock %}
+{% block content %}
+<div class="row text-center vertical-middle-sm">
+    <h1 style="font-family:Georgia;font-size:28px;">Authors</h1>
+    <br />
+</div>
+{% include 'query.html' %}
+<div>
+    <table id="table" class="table table-hover" style="font-family:'Times New Roman';font-size:14px">
+        <thead>
+         <tr>
+            <th class="text-center" >Name</th>
+            <th class="col-md-6 text-center" >Affiliation</th>
+            <th class="text-center" >IFscore</th>
+            <th class="col-md-3 text-center" >Papers</th>
+            <th class="col-md-1 text-center">Email</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for author in authors_info %}
+            <tr>
+                <td class="text-center"><a href="/famine/author/{{ author.0.id }}">{{ author.0.name }}</a></td>
+                <td class="text-left">{{ author.0.affiliation }}</td>
+                <td class="text-center">{{ author.1 }}</td>
+                <td class="text-left">
+                    <ul>
+                        {% for article in author.2 %}
+                        <li>
+                            <a href="/famine/title/{{ article.article.pmid }}">{{ article.article.journal.name }}</a>
+                            &nbsp;&nbsp;{{ article.article.pubdate|striptags|slice:"4" }}&nbsp;&nbsp;
+                            {% if article.first == 'Yes' and article.cofirst == None %}First author&nbsp;{% endif %}
+                            {% if article.first == 'Yes' and article.cofirst == 'Yes' %}Co-first author&nbsp;{{ article.rank }}{% endif %}
+                            {% if article.first == None and article.cofirst == 'Yes' %}Co-first author&nbsp;{{ article.rank }}{% endif %}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </td>
+                <td class="text-center">{% if author.0.email == None %}&nbsp;{% else %}{{ author.0.email }}{% endif %}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+    </table>
+</div>
+<div id="page" class="row">
+    <nav aria-lable="Page navigation">
+        <ul class="pagination">
+            {% if authors_info.has_previous %}
+                <li>
+                    <a href=
+                    "?name={{ dict.name|trimdash }}&rela={{ dict.rela }}&journal={{ dict.journal }}&andor={{ dict.andor }}&fdate={{ dict.fdate }}&tdate={{ dict.tdate }}&page={{ authors_info.previous_page_number }}"
+                    aria-lable='Previous'>
+                        <span aria-hidden="true">&laquo;</span>                    
+                    </a>
+                </li>
+            {% endif %}
+            {% for pg in authors_info.paginator.page_range %}
+                {% if authors_info.number == pg %}
+                    <li class="active"><a href=
+                        "?name={{ dict.name|trimdash }}&rela={{ dict.rela }}&journal={{ dict.journal }}&andor={{ dict.andor }}&fdate={{ dict.fdate }}&tdate={{ dict.tdate }}&page={{ pg }}">
+                        {{ pg }}</a></li>
+                {% else %}
+                    <li><a href=
+                        "?name={{ dict.name|trimdash }}&rela={{ dict.rela }}&journal={{ dict.journal }}&andor={{ dict.andor }}&fdate={{ dict.fdate }}&tdate={{ dict.tdate }}&page={{ pg }}">
+                        {{ pg }}</a></li>
+                {% endif %}
+            {% endfor %}
+            {% if authors_info.has_next %}
+                <li>
+                    <a href=
+                    "?name={{ dict.name|trimdash }}&rela={{ dict.rela }}&journal={{ dict.journal }}&andor={{ dict.andor }}&fdate={{ dict.fdate }}&tdate={{ dict.tdate }}&page={{ authors_info.next_page_number }}"
+                    aria-lablle="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>
+<script src="{% static 'js/jquery.js' %}"></script>
+<script  type = "text/javascript" >
+    onload=function change(){
+        var js_dict = {{ js_dict|safe }};
+        document.getElementById("rel")[js_dict['rela']].selected=true;
+        document.getElementById("ando")[js_dict['andor']].selected=true;
+        document.getElementById("reand")[js_dict['reand']].selected=true;
+        document.getElementById("order")[js_dict['order']].selected=true;
+        document.getElementById("topic")[js_dict['topic']].selected=true;
+        var select = document.getElementById("journal");
+        var options = select.options;
+        for(i of js_dict['journal']){
+            for(j of options){
+                if(i==j.value){
+                    j.selected = true;
+                };
+            };
+        };
+    };
+</script >
+{% endblock %}
